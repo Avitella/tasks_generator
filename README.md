@@ -38,7 +38,7 @@ Question class for questions in Generator constructor
 * theme_id
 * difficulty
 
-### Tasks::Generator::Generator
+### TasksGenerator::Generator
 Test tasks generator
 * generate() - this method returns array of questions
 
