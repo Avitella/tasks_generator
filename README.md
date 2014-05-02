@@ -18,7 +18,29 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### TasksGenerator::Config
+Config for configure Generator
+* life_time - iterations count for genetic algorithm (default: 1000)
+* mutation_chance - mutation chance (default: 0.05)
+* population_size - starting population (default: 1000)
+* tasks - tasks count
+* themes - array of Theme
+
+### TasksGenerator::Theme
+Theme class for config.themes  
+* theme_id
+* difficulty_min
+* difficulty_max
+
+### TasksGenerator::Question
+Question class for questions in Generator constructor
+* question_id
+* theme_id
+* difficulty
+
+### Tasks::Generator::Generator
+Test tasks generator
+* generate() - this method returns array of questions
 
 ## Contributing
 
