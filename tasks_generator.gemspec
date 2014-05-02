@@ -24,6 +24,10 @@ spec = Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rice"
 
+  spec.add_runtime_dependency "bundler", "~> 1.6"
+  spec.add_runtime_dependency "rake"
+  spec.add_runtime_dependency "rice"
+
   spec.platform = Gem::Platform::RUBY
   spec.extensions = %w[ext/tasks_generator/extconf.rb]
 end
