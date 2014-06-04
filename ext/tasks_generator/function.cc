@@ -82,7 +82,13 @@ static double fitness(individual_t const &individual) {
   }
   double d = (sqrs - s * s / individual.size()) / individual.size();
   double metric_one = (d > 0 ? 1.0 / d + 1.0 : 2);
-  return metric_one; // FIXME: add diff metric
+
+  std::unordered_set<size_t> uniqs;
+  for (task_t const &task : individual)
+    for (question_t const &question : task)
+      uniqs.insert(question.get_question_id());
+
+  return metric_one * uniqs.size(); // FIXME: add diff metric
 }
 
 static individual_t crossover(individual_t const &a, individual_t const &b) {
