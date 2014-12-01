@@ -2,50 +2,42 @@
 
 #include <string>
 
-namespace tasks_generator {
+namespace ailab {
 
 class question_t {
-  size_t question_id, theme_id, difficulty;
+  size_t question_id, topic_id, difficulty, select_id;
+  std::string text;
 
-public:
-  question_t() :
-      question_id(0),
-      theme_id(0),
-      difficulty(0) {
+ public:
+  question_t(size_t question_id, size_t topic_id, size_t difficulty, std::string const text = "") noexcept :
+      question_id(question_id),
+      topic_id(topic_id),
+      difficulty(difficulty),
+      text(text) {
   }
 
-  question_t(size_t qid, size_t tid, size_t difficulty) :
-      question_id(qid),
-      theme_id(tid),
-      difficulty(difficulty) {
+  void set_select_id(size_t x) noexcept {
+    select_id = x;
   }
 
-  size_t get_difficulty() const {
-    return difficulty;
+  size_t get_select_id() const noexcept {
+    return select_id;
   }
 
-  size_t get_question_id() const {
+  size_t get_question_id() const noexcept {
     return question_id;
   }
 
-  size_t get_theme_id() const {
-    return theme_id;
+  size_t get_topic_id() const noexcept {
+    return topic_id;
   }
 
-  bool operator == (question_t const &q) const {
-    return question_id == q.question_id;
+  size_t get_difficulty() const noexcept {
+    return difficulty;
   }
 
-  static bool theme_id_cmp(question_t const &a, question_t const &b) {
-    return a.theme_id < b.theme_id;
-  }
-
-  static bool difficulty_cmp(question_t const &a, question_t const &b) {
-    return a.difficulty < b.difficulty;
-  }
-
-  static bool difficulty_size_t_cmp(question_t const &a, size_t d) {
-    return a.difficulty < d;
+  std::string const &get_text() const noexcept {
+    return text;
   }
 };
 

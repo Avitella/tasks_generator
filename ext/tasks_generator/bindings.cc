@@ -5,17 +5,18 @@
 #include "config.h"
 #include "generator.h"
 #include "question.h"
-#include "theme.h"
+#include "topic.h"
 
 using namespace tasks_generator;
 
 template<>
 question_t from_ruby<question_t>(Rice::Object obj) {
   size_t qid = from_ruby<size_t>(obj.call("question_id"));
-  size_t tid = from_ruby<size_t>(obj.call("theme_id"));
+  size_t tid = from_ruby<size_t>(obj.call("topic_id"));
   size_t d = from_ruby<size_t>(obj.call("difficulty"));
+  std::string t = from_ruby<std::string>(obj.call("text"));
 
-  return question_t(qid, tid, d);
+  return question_t(qid, tid, d, t);
 }
 
 template<>
@@ -45,30 +46,30 @@ Rice::Object to_ruby(std::vector<question_t> const &questions) {
 }
 
 template<>
-theme_t from_ruby<theme_t>(Rice::Object obj) {
-  size_t id = from_ruby<size_t>(obj.call("theme_id"));
-  size_t dmin = from_ruby<size_t>(obj.call("difficulty_min"));
-  size_t dmax = from_ruby<size_t>(obj.call("difficulty_max"));
+topic_t from_ruby<topic_t>(Rice::Object obj) {
+  size_t id = from_ruby<size_t>(obj.call("topic_id"));
+  size_t pid = from_ruby<size_t>(obj.call("parent_id"));
+  size_t text = from_ruby<size_t>(obj.call("text"));
 
-  return theme_t(id, dmin, dmax);
+  return topic_t(id, pid, text);
 }
 
 template<>
-Rice::Object to_ruby<theme_t>(theme_t const &th) {
-  return Rice::Data_Object<theme_t>(new theme_t(th)); 
+Rice::Object to_ruby<topic_t>(topic_t const &th) {
+  return Rice::Data_Object<topic_t>(new topic_t(th)); 
 }
 
 template<>
-std::vector<theme_t> from_ruby<std::vector<theme_t>>(Rice::Object obj) {
+std::vector<topic_t> from_ruby<std::vector<topic_t>>(Rice::Object obj) {
   Rice::Array arr(obj);
 
-  std::vector<theme_t> themes;
-  themes.reserve(arr.size());
+  std::vector<topic_t> topics;
+  topics.reserve(arr.size());
 
   for (Rice::Object obj : arr)
-    themes.push_back(from_ruby<theme_t>(obj));
+    topics.push_back(from_ruby<topic_t>(obj));
 
-  return themes;
+  return topics;
 }
 
 void set_life_time(Rice::Object obj, size_t life_time) {
@@ -95,25 +96,33 @@ size_t get_population_size(Rice::Object obj) {
   return Rice::Data_Object<config_t>(obj)->population_size;
 }
 
-void set_tasks(Rice::Object obj, size_t tasks) {
-  Rice::Data_Object<config_t>(obj)->tasks = tasks;
+void set_variants_count(Rice::Object obj, size_t variants_count) {
+  Rice::Data_Object<config_t>(obj)->variants_count = variants_count;
 }
 
-size_t get_tasks(Rice::Object obj) {
-  return Rice::Data_Object<config_t>(obj)->tasks;
+size_t get_variants_count(Rice::Object obj) {
+  return Rice::Data_Object<config_t>(obj)->variants_count;
 }
 
-void set_themes(Rice::Object obj, Rice::Array themes) {
-  std::vector<theme_t> th = from_ruby<std::vector<theme_t>>(themes);
-  Rice::Data_Object<config_t>(obj)->themes = std::move(th);
+void set_questions_count(Rice::Object obj, size_t questions_count) {
+  Rice::Data_Object<config_t>(obj)->questions_count = questions_count;
 }
 
-Rice::Array get_themes(Rice::Object obj) {
-  std::vector<theme_t> const &themes = Rice::Data_Object<config_t>(obj)->themes;
+size_t get_questions_count(Rice::Object obj) {
+  return Rice::Data_Object<config_t>(obj)->questions_count;
+}
+
+void set_topics(Rice::Object obj, Rice::Array topics) {
+  std::vector<size_t> th = from_ruby<std::vector<size_t>>(topics);
+  Rice::Data_Object<config_t>(obj)->topics = std::move(th);
+}
+
+Rice::Array get_topics(Rice::Object obj) {
+  std::vector<size_t> const &topics = Rice::Data_Object<config_t>(obj)->topics;
 
   Rice::Array arr;
-  for (theme_t const &t : themes)
-    arr.push(to_ruby<theme_t>(t));
+  for (topic_t const &t : topics)
+    arr.push(to_ruby<size_t>(t));
 
   return arr;
 }
@@ -125,8 +134,9 @@ config_t from_ruby<config_t>(Rice::Object obj) {
   result.life_time = from_ruby<size_t>(obj.call("life_time"));
   result.mutation_chance = from_ruby<double>(obj.call("mutation_chance"));
   result.population_size = from_ruby<size_t>(obj.call("population_size"));
-  result.tasks = from_ruby<size_t>(obj.call("tasks"));
-  result.themes = from_ruby<std::vector<theme_t>>(obj.call("themes"));
+  result.variants_count = from_ruby<size_t>(obj.call("variants_count"));
+  result.questions_count = from_ruby<size_t>(obj.call("questions_count"));
+  result.topics = from_ruby<std::vector<size_t>>(obj.call("topics"));
 
   return result;
 }
@@ -139,9 +149,10 @@ Rice::Object to_ruby<config_t>(config_t const &cnf) {
 template<>
 generator_t from_ruby<generator_t>(Rice::Object obj) {
   config_t config = from_ruby<config_t>(obj.call("config"));
+  std::vector<topic_t> topics = from_ruby<topic_t>(obj.call("topics"));
   std::vector<question_t> questions = from_ruby<std::vector<question_t>>(obj.call("questions"));
 
-  return generator_t(std::move(config), std::move(questions));
+  return generator_t(std::move(config), std::move(topics), std::move(questions));
 }
 
 template<>
@@ -150,7 +161,7 @@ Rice::Object to_ruby(generator_t const &t) {
 }
 
 template<>
-Rice::Object to_ruby<generator_t::answer_t>(generator_t::answer_t const &ans) {
+Rice::Object to_ruby<variants_t>(variants_t const &ans) {
   Rice::Array result;
   for (std::vector<question_t> const &arr : ans) {
     Rice::Array buffer;
@@ -165,36 +176,37 @@ extern "C" void Init_tasks_generator() {
   Rice::Module rb_mTasksGenerator = Rice::define_module("TasksGenerator");
 
   Rice::Data_Type<config_t> rb_cConfig = Rice::define_class_under<config_t>(rb_mTasksGenerator, "Config")
-    .define_constructor(Rice::Constructor<config_t, size_t>(), Rice::Arg("tasks") = 0)
+    .define_constructor(Rice::Constructor<config_t, size_t, size_t>(), Rice::Arg("variants_count") = 8, Rice::Arg("questions_count") = 8)
     .define_method("life_time=", &set_life_time)
     .define_method("mutation_chance=", &set_mutation_chance)
     .define_method("population_size=", &set_population_size)
-    .define_method("tasks=", &set_tasks)
+    .define_method("variants_count=", &set_variants_count)
+    .define_method("questions_count=", &set_questions_count)
     .define_method("life_time", &get_life_time)
     .define_method("mutation_chance", &get_mutation_chance)
     .define_method("population_size", &get_population_size)
-    .define_method("tasks", &get_tasks)
-    .define_method("themes", &get_themes)
-    .define_method("themes=", &set_themes);
+    .define_method("variants_count", &get_variants_count)
+    .define_method("questions_count", &get_questions_count)
+    .define_method("topics", &get_topics)
+    .define_method("topics=", &set_topics);
 
-  Rice::Data_Type<theme_t> rb_cTheme = Rice::define_class_under<theme_t>(rb_mTasksGenerator, "Theme")
-    .define_constructor(Rice::Constructor<theme_t, size_t, size_t, size_t>(),
-      (Rice::Arg("id"), Rice::Arg("dmin"), Rice::Arg("dmax")))
-    .define_method("theme_id", &theme_t::get_theme_id)
-    .define_method("difficulty_min", &theme_t::get_difficulty_min)
-    .define_method("difficulty_max", &theme_t::get_difficulty_max);
+  Rice::Data_Type<topic_t> rb_ctopic = Rice::define_class_under<topic_t>(rb_mTasksGenerator, "Topic")
+    .define_constructor(Rice::Constructor<topic_t, size_t, size_t, std::string>(),
+      (Rice::Arg("id"), Rice::Arg("pid"), Rice::Arg("text")))
+    .define_method("topic_id", &topic_t::get_topic_id)
+    .define_method("parent_id", &topic_t::get_parent_id)
+    .define_method("text", &topic_t::get_text);
 
   Rice::Data_Type<question_t> rb_cQuestion = Rice::define_class_under<question_t>(rb_mTasksGenerator, "Question")
-    .define_constructor(Rice::Constructor<question_t, size_t, size_t, size_t>(),
-      (Rice::Arg("id"), Rice::Arg("tid"), Rice::Arg("difficulty")))
+    .define_constructor(Rice::Constructor<question_t, size_t, size_t, size_t, std::string>(),
+      (Rice::Arg("id"), Rice::Arg("tid"), Rice::Arg("difficulty"), Rice::Arg("text")))
     .define_method("question_id", &question_t::get_question_id)
-    .define_method("theme_id", &question_t::get_theme_id)
-    .define_method("difficulty", &question_t::get_difficulty);
+    .define_method("topic_id", &question_t::get_topic_id)
+    .define_method("difficulty", &question_t::get_difficulty)
+    .define_method("text", &question_t::get_text);
 
   Rice::Data_Type<generator_t> rb_cGenerator = Rice::define_class_under<generator_t>(rb_mTasksGenerator, "Generator")
-    .define_constructor(Rice::Constructor<generator_t, config_t, std::vector<question_t>>(),
-      (Rice::Arg("cnf"), Rice::Arg("questions")))
-    .define_method("config", &generator_t::get_config)
-    .define_method("questions", &generator_t::get_questions)
+    .define_constructor(Rice::Constructor<generator_t, config_t, std::vector<topic_t>, std::vector<question_t>>(),
+      (Rice::Arg("cnf"), Rice::Arg("topics"), Rice::Arg("questions")))
     .define_method("generate", &generator_t::generate);
 }
