@@ -72,6 +72,24 @@ std::vector<topic_t> from_ruby<std::vector<topic_t>>(Rice::Object obj) {
   return topics;
 }
 
+template<>
+Rice::Object to_ruby<std::vector<size_t>>(std::vector<size_t> const &v) {
+  return Rice::Data_Object<std::vector<size_t>>(new std::vector<size_t>(v));
+}
+
+template<>
+std::vector<size_t> from_ruby<std::vector<size_t>>(Rice::Object obj) {
+  Rice::Array arr(obj);
+
+  std::vector<size_t> result;
+  result.reserve(arr.size());
+
+  for (Rice::Object obj : arr)
+    result.push_back(from_ruby<size_t>(obj));
+
+  return result;
+}
+
 void set_life_time(Rice::Object obj, size_t life_time) {
   Rice::Data_Object<config_t>(obj)->life_time = life_time;
 }
