@@ -7,7 +7,7 @@
 #include "question.h"
 #include "topic.h"
 
-using namespace tasks_generator;
+using namespace ailab;
 
 template<>
 question_t from_ruby<question_t>(Rice::Object obj) {
@@ -49,7 +49,7 @@ template<>
 topic_t from_ruby<topic_t>(Rice::Object obj) {
   size_t id = from_ruby<size_t>(obj.call("topic_id"));
   size_t pid = from_ruby<size_t>(obj.call("parent_id"));
-  size_t text = from_ruby<size_t>(obj.call("text"));
+  std::string text = from_ruby<std::string>(obj.call("text"));
 
   return topic_t(id, pid, text);
 }
@@ -121,7 +121,7 @@ Rice::Array get_topics(Rice::Object obj) {
   std::vector<size_t> const &topics = Rice::Data_Object<config_t>(obj)->topics;
 
   Rice::Array arr;
-  for (topic_t const &t : topics)
+  for (size_t t : topics)
     arr.push(to_ruby<size_t>(t));
 
   return arr;
@@ -149,7 +149,7 @@ Rice::Object to_ruby<config_t>(config_t const &cnf) {
 template<>
 generator_t from_ruby<generator_t>(Rice::Object obj) {
   config_t config = from_ruby<config_t>(obj.call("config"));
-  std::vector<topic_t> topics = from_ruby<topic_t>(obj.call("topics"));
+  std::vector<topic_t> topics = from_ruby<std::vector<topic_t>>(obj.call("topics"));
   std::vector<question_t> questions = from_ruby<std::vector<question_t>>(obj.call("questions"));
 
   return generator_t(std::move(config), std::move(topics), std::move(questions));
@@ -162,8 +162,9 @@ Rice::Object to_ruby(generator_t const &t) {
 
 template<>
 Rice::Object to_ruby<variants_t>(variants_t const &ans) {
+  std::vector<std::vector<question_t>> const &questions = ans.get_questions();
   Rice::Array result;
-  for (std::vector<question_t> const &arr : ans) {
+  for (std::vector<question_t> const &arr : questions) {
     Rice::Array buffer;
     for (question_t const &q : arr)
       buffer.push(to_ruby<question_t>(q));
@@ -176,7 +177,7 @@ extern "C" void Init_tasks_generator() {
   Rice::Module rb_mTasksGenerator = Rice::define_module("TasksGenerator");
 
   Rice::Data_Type<config_t> rb_cConfig = Rice::define_class_under<config_t>(rb_mTasksGenerator, "Config")
-    .define_constructor(Rice::Constructor<config_t, size_t, size_t>(), Rice::Arg("variants_count") = 8, Rice::Arg("questions_count") = 8)
+    .define_constructor(Rice::Constructor<config_t, size_t, size_t>(), (Rice::Arg("config"), Rice::Arg("variants_count") = 8, Rice::Arg("questions_count") = 8))
     .define_method("life_time=", &set_life_time)
     .define_method("mutation_chance=", &set_mutation_chance)
     .define_method("population_size=", &set_population_size)

@@ -191,6 +191,10 @@ class variants_t {
       }
     }
   }
+
+  std::vector<std::vector<question_t>> const &get_questions() const noexcept {
+    return questions;
+  }
 };
 
 }
