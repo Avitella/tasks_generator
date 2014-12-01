@@ -135,7 +135,13 @@ class variants_t {
         size_t count = 1;
         for (size_t j = 1; j < questions[i].size(); ++j)
           count += buffer[j] != buffer[j - 1];
-        std::pair<size_t, size_t> counter[count];
+        struct pair {
+          size_t first;
+          size_t second;
+        };
+        pair counter[count];
+        for (size_t i = 0; i < count; ++i)
+          counter[i].first = counter[i].second = 0;
         ssize_t k = -1;
         for (size_t j = 0; j < questions[i].size(); ++j) {
           if (k == -1 || buffer[j] != counter[k].first) {
@@ -144,7 +150,7 @@ class variants_t {
           }
           ++counter[k].second;
         }
-        std::sort(counter, counter + count, [] (std::pair<size_t, size_t> const &a, std::pair<size_t, size_t> const &b) -> bool {
+        std::sort(counter, counter + count, [] (pair const &a, pair const &b) -> bool {
           return a.second > b.second;
         });
         double x = 0;
