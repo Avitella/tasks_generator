@@ -177,7 +177,8 @@ extern "C" void Init_tasks_generator() {
   Rice::Module rb_mTasksGenerator = Rice::define_module("TasksGenerator");
 
   Rice::Data_Type<config_t> rb_cConfig = Rice::define_class_under<config_t>(rb_mTasksGenerator, "Config")
-    .define_constructor(Rice::Constructor<config_t, size_t, size_t>(), (Rice::Arg("variants_count") = 8, Rice::Arg("questions_count") = 8))
+    .define_constructor(Rice::Constructor<config_t, size_t, size_t>(),
+      (Rice::Arg("variants_count") = 8, Rice::Arg("questions_count") = 8))
     .define_method("life_time=", &set_life_time)
     .define_method("mutation_chance=", &set_mutation_chance)
     .define_method("population_size=", &set_population_size)
