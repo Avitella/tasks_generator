@@ -31,28 +31,6 @@ struct config_t {
       questions_count(q_count),
       topics() {
   }
-
-  config_t(std::unordered_map<std::string, std::string> const &map) noexcept :
-      config_t() {
-    if (map.find("life-time") != map.end())
-      life_time = std::stoul(map.at("life-time"));
-    if (map.find("population-size") != map.end())
-      population_size = std::stoul(map.at("population-size"));
-    if (map.find("mutation-chance") != map.end())
-      mutation_chance = std::stod(map.at("mutation-chance"));
-    if (map.find("log-enabled") != map.end())
-      log_enabled = true;
-    if (map.find("variants-count") != map.end())
-      variants_count = std::stoul(map.at("variants-count"));
-    if (map.find("questions-count") != map.end())
-      questions_count = std::stoul(map.at("questions-count"));
-    if (map.find("stat-enabled") != map.end())
-      stat_enabled = true;
-    if (map.find("mutation-duplicate-chance") != map.end())
-      mutation_duplicate_chance = std::stod(map.at("mutation-duplicate-chance"));
-    if (map.find("try-generate") != map.end())
-      try_generate = std::stod(map.at("try-generate"));
-  }
 };
 
 std::ostream& operator << (std::ostream& out, config_t const &config) {
