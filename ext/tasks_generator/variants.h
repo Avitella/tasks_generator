@@ -102,18 +102,6 @@ class variants_t {
       for (size_t i = 0; i < questions.size(); ++i) {
         size_t buffer[questions[i].size()];
         for (size_t j = 0; j < questions[i].size(); ++j)
-          buffer[j] = questions[i][j].get_select_id();
-        std::sort(buffer, buffer + questions[i].size());
-        size_t count = 1;
-        for (size_t j = 1; j < questions[i].size(); ++j)
-          count += buffer[j] != buffer[j - 1];
-        fitness += double(count) / questions[i].size();
-      }
-    }
-    {
-      for (size_t i = 0; i < questions.size(); ++i) {
-        size_t buffer[questions[i].size()];
-        for (size_t j = 0; j < questions[i].size(); ++j)
           buffer[j] = questions[i][j].get_topic_id();
         std::sort(buffer, buffer + questions[i].size());
         size_t count = 1;
@@ -142,7 +130,7 @@ class variants_t {
       for (size_t i = 0; i < questions.size(); ++i) {
         size_t buffer[questions[i].size()];
         for (size_t j = 0; j < questions[i].size(); ++j)
-          buffer[j] = questions[i][j].get_select_id();
+          buffer[j] = questions[i][j].get_topic_id();
         std::sort(buffer, buffer + questions[i].size());
         size_t count = 1;
         for (size_t j = 1; j < questions[i].size(); ++j)
