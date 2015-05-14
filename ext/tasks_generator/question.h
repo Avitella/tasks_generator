@@ -5,7 +5,7 @@
 namespace ailab {
 
 class question_t {
-  size_t question_id, topic_id, difficulty, select_id;
+  size_t question_id, topic_id, difficulty, second_level_topic_id;
   std::string text;
 
  public:
@@ -13,15 +13,16 @@ class question_t {
       question_id(question_id),
       topic_id(topic_id),
       difficulty(difficulty),
+      second_level_topic_id(0),
       text(text) {
   }
 
-  void set_select_id(size_t x) noexcept {
-    select_id = x;
+  void set_second_level_topic_id(size_t x) noexcept {
+    second_level_topic_id = x;
   }
 
-  size_t get_select_id() const noexcept {
-    return select_id;
+  size_t get_second_level_topic_id() const noexcept {
+    return second_level_topic_id;
   }
 
   size_t get_question_id() const noexcept {

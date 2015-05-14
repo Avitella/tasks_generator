@@ -90,6 +90,18 @@ class variants_t {
       for (size_t i = 0; i < questions.size(); ++i) {
         size_t buffer[questions[i].size()];
         for (size_t j = 0; j < questions[i].size(); ++j)
+          buffer[j] = questions[i][j].get_second_level_topic_id();
+        std::sort(buffer, buffer + questions[i].size());
+        size_t count = 1;
+        for (size_t j = 1; j < questions[i].size(); ++j)
+          count += buffer[j] != buffer[j - 1];
+        fitness += count;
+      }
+    }
+    {
+      for (size_t i = 0; i < questions.size(); ++i) {
+        size_t buffer[questions[i].size()];
+        for (size_t j = 0; j < questions[i].size(); ++j)
           buffer[j] = questions[i][j].get_question_id();
         std::sort(buffer, buffer + questions[i].size());
         size_t count = 1;

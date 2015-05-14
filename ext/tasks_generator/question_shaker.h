@@ -54,7 +54,6 @@ class question_shaker_t {
       throw std::logic_error("Not enough questions for topic");
     size_t r = rand() % questions.at(topic_id).size();
     question_t result = questions.at(topic_id)[r];
-    result.set_select_id(topic_id);
     return result;
   }
 };

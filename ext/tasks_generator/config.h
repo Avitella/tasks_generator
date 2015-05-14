@@ -33,7 +33,7 @@ struct config_t {
   }
 };
 
-std::ostream& operator << (std::ostream& out, config_t const &config) {
+inline std::ostream& operator << (std::ostream& out, config_t const &config) {
   out << "config.life_time = " << config.life_time << std::endl;
   out << "config.population_size = " << config.population_size << std::endl;
   out << "config.mutation_chance = " << config.mutation_chance << std::endl;
