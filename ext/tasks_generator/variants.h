@@ -95,7 +95,7 @@ class variants_t {
         size_t count = 1;
         for (size_t j = 1; j < questions[i].size(); ++j)
           count += buffer[j] != buffer[j - 1];
-        fitness += count;
+        fitness += count * 10;
       }
     }
     {
