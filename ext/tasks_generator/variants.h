@@ -70,8 +70,8 @@ class variants_t {
   }
 
   double calculate_fitness_function() const noexcept {
-    if (!changed) 
-      return fitness;
+    // if (!changed) 
+    //   return fitness;
     size_t questions_count = 0;
     for (auto const &v : questions)
       questions_count += v.size();
@@ -95,7 +95,7 @@ class variants_t {
         size_t count = 1;
         for (size_t j = 1; j < questions[i].size(); ++j)
           count += buffer[j] != buffer[j - 1];
-        fitness += count * 10;
+        fitness += count * 10 / questions[i].size();
       }
     }
     {
@@ -171,7 +171,7 @@ class variants_t {
         fitness += x;
       }
     }
-    changed = false;
+    // changed = false;
     return fitness;
   }
 
