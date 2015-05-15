@@ -119,28 +119,28 @@ class generator_t {
     return true;
   }
 
-  void mark_second_levels(std::vector<question_t> &questions, std::vector<topic_t> const &topics) noexcept;
+  void mark_questions(std::vector<question_t> &questions, std::vector<topic_t> const &topics) noexcept;
 
  public:
   generator_t(config_t const &cnf, std::vector<topic_t> const &topics_, std::vector<question_t> const &questions_) noexcept :
       config(cnf),
       topics(topics_),
       questions(questions_) {
-    mark_second_levels(questions, topics);
+    mark_questions(questions, topics);
   }
 
   generator_t(config_t &&cnf, std::vector<topic_t> &&topics_, std::vector<question_t> &&questions_) noexcept :
       config(cnf),
       topics(topics_),
       questions(questions_) {
-    mark_second_levels(questions, topics);
+    mark_questions(questions, topics);
   }
 
   generator_t(generator_t const &other) noexcept :
       config(other.config),
       topics(other.topics),
       questions(other.questions) {
-    mark_second_levels(questions, topics);
+    mark_questions(questions, topics);
   }
 
   variants_t generate() {

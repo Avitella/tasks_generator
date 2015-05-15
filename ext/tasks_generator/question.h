@@ -5,7 +5,7 @@
 namespace ailab {
 
 class question_t {
-  size_t question_id, topic_id, difficulty, second_level_topic_id;
+  size_t question_id, topic_id, difficulty, second_level_topic_id, parent_topic_id;
   std::string text;
 
  public:
@@ -14,6 +14,7 @@ class question_t {
       topic_id(topic_id),
       difficulty(difficulty),
       second_level_topic_id(0),
+      parent_topic_id(0),
       text(text) {
   }
 
@@ -23,6 +24,14 @@ class question_t {
 
   size_t get_second_level_topic_id() const noexcept {
     return second_level_topic_id;
+  }
+
+  void set_parent_topic_id(size_t x) noexcept {
+    parent_topic_id = x;
+  }
+
+  size_t get_parent_topic_id() const noexcept {
+    return parent_topic_id;
   }
 
   size_t get_question_id() const noexcept {

@@ -70,8 +70,8 @@ class variants_t {
   }
 
   double calculate_fitness_function() const noexcept {
-    // if (!changed) 
-    //   return fitness;
+    if (!changed) 
+      return fitness;
     size_t questions_count = 0;
     for (auto const &v : questions)
       questions_count += v.size();
@@ -90,12 +90,24 @@ class variants_t {
       for (size_t i = 0; i < questions.size(); ++i) {
         size_t buffer[questions[i].size()];
         for (size_t j = 0; j < questions[i].size(); ++j)
+          buffer[j] = questions[i][j].get_parent_topic_id();
+        std::sort(buffer, buffer + questions[i].size());
+        size_t count = 1;
+        for (size_t j = 1; j < questions[i].size(); ++j)
+          count += buffer[j] != buffer[j - 1];
+        fitness += double(count) / questions[i].size();
+      }
+    }
+    {
+      for (size_t i = 0; i < questions.size(); ++i) {
+        size_t buffer[questions[i].size()];
+        for (size_t j = 0; j < questions[i].size(); ++j)
           buffer[j] = questions[i][j].get_second_level_topic_id();
         std::sort(buffer, buffer + questions[i].size());
         size_t count = 1;
         for (size_t j = 1; j < questions[i].size(); ++j)
           count += buffer[j] != buffer[j - 1];
-        fitness += count * 10 / questions[i].size();
+        fitness += double(count) / questions[i].size();
       }
     }
     {
@@ -119,7 +131,7 @@ class variants_t {
         size_t count = 1;
         for (size_t j = 1; j < questions[i].size(); ++j)
           count += buffer[j] != buffer[j - 1];
-        fitness += double(count) * 10.0 / questions[i].size();
+        fitness += double(count) / questions[i].size();
       }
     }
     {
@@ -171,7 +183,7 @@ class variants_t {
         fitness += x;
       }
     }
-    // changed = false;
+    changed = false;
     return fitness;
   }
 
@@ -208,6 +220,7 @@ class variants_t {
         }
       }
     }
+    changed = true;
   }
 
   std::vector<std::vector<question_t>> const &get_questions() const noexcept {

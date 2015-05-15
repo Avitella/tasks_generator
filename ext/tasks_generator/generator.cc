@@ -5,7 +5,7 @@
 
 namespace ailab {
 
-void generator_t::mark_second_levels(std::vector<question_t> &questions, std::vector<topic_t> const &topics) noexcept {
+void generator_t::mark_questions(std::vector<question_t> &questions, std::vector<topic_t> const &topics) noexcept {
   std::unordered_map<size_t, size_t> topic_id_to_index;
   std::unordered_map<size_t, size_t> topic_index_to_parent_index;
   for (size_t i = 0; i < topics.size(); ++i)
@@ -26,6 +26,14 @@ void generator_t::mark_second_levels(std::vector<question_t> &questions, std::ve
         topic_index = parent_index;
       }
       q.set_second_level_topic_id(topics[topic_index].get_topic_id());
+    }
+  }
+  for (question_t &q : questions) {
+    size_t topic_id = q.get_topic_id();
+    if (topic_id_to_index.find(topic_id) != topic_id_to_index.end()) {
+      size_t topic_index = topic_id_to_index[topic_id];
+      size_t parent_topic_id = topics[topic_index].get_parent_id();
+      q.set_parent_topic_id(parent_topic_id);
     }
   }
 }
